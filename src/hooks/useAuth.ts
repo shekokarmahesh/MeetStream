@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User } from '@/types/auth';
+import type { User } from '@/types/auth';
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -17,7 +17,6 @@ export const useAuth = () => {
         setUser(parsedUser);
       }
     } catch (error) {
-      console.error('Error parsing user data:', error);
       localStorage.removeItem('user');
     } finally {
       setIsLoading(false);

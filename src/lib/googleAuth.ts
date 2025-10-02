@@ -1,4 +1,4 @@
-import { GoogleUser, GoogleCredentialPayload, User } from '@/types/auth';
+import type { GoogleUser, GoogleCredentialPayload, User } from '@/types/auth';
 
 export const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
@@ -28,10 +28,21 @@ export const initializeGoogleAuth = (callback: (response: GoogleUser) => void) =
     return;
   }
 
-  window.google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback,
-  });
+  if (!GOOGLE_CLIENT_ID) {
+    console.error('Google Client ID not found. Please set VITE_GOOGLE_CLIENT_ID in your environment variables.');
+    return false;
+  }
+
+  try {
+    window.google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback,
+    });
+    return true;
+  } catch (error) {
+    console.error('Failed to initialize Google Auth:', error);
+    return false;
+  }
 };
 
 export const renderGoogleButton = (

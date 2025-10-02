@@ -11,4 +11,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      '/api/mcp': {
+        target: 'https://apollo.composio.dev',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/mcp/, '/v3/mcp/f61fe1ab-bd1b-4562-8f12-d9449d4febce/mcp'),
+        secure: false,
+        ws: true, // Enable WebSocket proxying
+      }
+    }
+  }
 })
