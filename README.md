@@ -50,67 +50,68 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## React Compiler
+## Quick Start
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
+- Node.js 18+ and npm
+- Google Cloud Console project with OAuth 2.0 credentials
+- OpenRouter API key (for AI features)
+- Composio MCP server access
 
-## Expanding the ESLint configuration
+### Local Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Clone the repository:**
+   ```bash
+   git clone <repository-url>
+   cd katalyst
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. **Set up environment variables:**
+   Copy the example environment file and fill in your values:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Then edit `.env` with your actual values:
+   ```env
+   # Google OAuth Configuration
+   VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id_here
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   # Supabase Configuration (if using multi-user setup)
+   VITE_SUPABASE_URL=your_supabase_project_url_here
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+   # OpenRouter AI Configuration (for meeting summaries)
+   VITE_OPENROUTER_API_KEY=your_openrouter_api_key_here
+   VITE_OPENROUTER_BASE_URL=https://openrouter.ai/api/v1
+   VITE_CONTRACT_PARSER_MODEL=google/gemma-3-12b-it:free
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+   # Composio MCP Server Configuration
+   VITE_MCP_SERVER_URL=your_composio_mcp_server_url_here
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+   # Optional: Custom configurations
+   # VITE_APP_NAME=Katalyst
+   # VITE_APP_VERSION=1.0.0
+   ```
+
+4. **Start development server:**
+   ```bash
+   npm run dev
+   ```
+   
+   The app will be available at `http://localhost:5173`
+
+5. **Build for production:**
+   ```bash
+   npm run build
+   ```
+
+6. **Preview production build:**
+   ```bash
+   npm run preview
+   ```
