@@ -57,11 +57,11 @@ class OpenRouterService {
             {
               role: 'system',
               content: 'You are an AI assistant that creates concise, professional meeting summaries. Format your response with clear sections using **bold headers** for main topics like **Meeting Summary**, **Objective**, **Duration & Timing**, **Key Details**, and **Follow-up**. Keep summaries under 200 words and use structured formatting for better readability.'
-            },
+            } as OpenRouterMessage,
             {
               role: 'user',
               content: prompt
-            }
+            } as OpenRouterMessage
           ],
           max_tokens: 300,
           temperature: 0.7

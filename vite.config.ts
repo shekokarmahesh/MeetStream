@@ -11,6 +11,17 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          router: ['react-router-dom'],
+          ui: ['@radix-ui/react-avatar', '@radix-ui/react-separator', '@radix-ui/react-slot'],
+        },
+      },
+    },
+  },
   // Note: Proxy only works in development, not in production
   // For production, use direct MCP server URL in environment variables
   server: {
