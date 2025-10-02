@@ -4,6 +4,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.setHeader('Access-Control-Expose-Headers', 'Content-Type');
 
   // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
@@ -21,7 +22,7 @@ export default async function handler(req, res) {
     // Prepare headers for the MCP server request
     const forwardHeaders = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      'Accept': 'application/json, text/event-stream',
       'User-Agent': 'Katalyst-Proxy/1.0',
     };
 
@@ -61,8 +62,9 @@ export default async function handler(req, res) {
     const responseText = await response.text();
     console.log('MCP Response body:', responseText);
 
-    // Set response headers
-    res.setHeader('Content-Type', 'application/json');
+    // Set response headers based on the original response
+    const originalContentType = response.headers.get('content-type') || 'application/json';
+    res.setHeader('Content-Type', originalContentType);
     
     // Return the response
     res.status(response.status).send(responseText);
