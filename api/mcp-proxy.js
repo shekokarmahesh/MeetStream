@@ -3,7 +3,7 @@ export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
 
   // Handle preflight OPTIONS request
   if (req.method === 'OPTIONS') {
@@ -18,25 +18,59 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Prepare headers for the MCP server request
+    const forwardHeaders = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'User-Agent': 'Katalyst-Proxy/1.0',
+    };
+
+    // Add authorization if present
+    if (req.headers.authorization) {
+      forwardHeaders.Authorization = req.headers.authorization;
+    }
+
+    // Prepare the request body
+    let requestBody;
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      if (req.body && typeof req.body === 'object') {
+        requestBody = JSON.stringify(req.body);
+      } else if (typeof req.body === 'string') {
+        requestBody = req.body;
+      } else {
+        requestBody = JSON.stringify(req.body || {});
+      }
+    }
+
+    console.log('Proxying request to:', MCP_SERVER_URL);
+    console.log('Method:', req.method);
+    console.log('Headers:', forwardHeaders);
+    console.log('Body:', requestBody);
+
     // Forward the request to the actual MCP server
     const response = await fetch(MCP_SERVER_URL, {
       method: req.method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...req.headers,
-      },
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
+      headers: forwardHeaders,
+      body: requestBody,
     });
 
-    const data = await response.text();
+    console.log('MCP Response status:', response.status);
+    console.log('MCP Response headers:', Object.fromEntries(response.headers.entries()));
+
+    // Get response data
+    const responseText = await response.text();
+    console.log('MCP Response body:', responseText);
+
+    // Set response headers
+    res.setHeader('Content-Type', 'application/json');
     
-    // Set appropriate content type
-    const contentType = response.headers.get('content-type') || 'application/json';
-    res.setHeader('Content-Type', contentType);
-    
-    res.status(response.status).send(data);
+    // Return the response
+    res.status(response.status).send(responseText);
   } catch (error) {
     console.error('MCP Proxy Error:', error);
-    res.status(500).json({ error: 'Failed to proxy MCP request' });
+    res.status(500).json({ 
+      error: 'Failed to proxy MCP request',
+      details: error.message 
+    });
   }
 }
