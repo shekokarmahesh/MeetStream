@@ -11,6 +11,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Note: Proxy only works in development, not in production
+  // For production, use direct MCP server URL in environment variables
   server: {
     proxy: {
       '/api/mcp': {
