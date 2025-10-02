@@ -1,6 +1,49 @@
-# React + TypeScript + Vite
+# Katalyst - AI-Powered Calendar Assistant
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Katalyst is a modern React-based calendar management application that integrates with Google Calendar and provides AI-powered meeting summaries using OpenRouter API.
+
+## Features
+
+- 🔐 Google OAuth 2.0 Authentication
+- 📅 Real-time Google Calendar Integration via MCP
+- ✨ AI-Powered Meeting Summaries using OpenRouter
+- 🎨 Modern UI with TailwindCSS and Radix UI
+- 📱 Responsive Design
+
+## Environment Setup
+
+The OpenRouter API configuration is already set up in your `.env` file. Make sure you also have:
+
+```env
+# Google OAuth Configuration (required for calendar access)
+VITE_GOOGLE_CLIENT_ID="your-google-client-id"
+
+# MCP Server Configuration (required for calendar integration)
+VITE_MCP_SERVER_URL="your-mcp-server-url"
+```
+
+✅ **OpenRouter API is configured and ready to use!**
+
+## AI Summary Feature
+
+Click the ✨ icon on any meeting card to generate an AI-powered summary of the meeting details. The summary includes:
+- Meeting purpose and objectives
+- Key participants
+- Duration and timing context
+- Notable details from the description
+- Potential action items
+
+## Tech Stack
+
+- **Frontend**: React 19 with TypeScript
+- **Build Tool**: Vite with Hot Module Replacement
+- **Styling**: TailwindCSS 4.x with Radix UI components
+- **Routing**: React Router DOM v7
+- **Authentication**: Google OAuth 2.0
+- **Calendar Integration**: MCP (Model Context Protocol) via Composio
+- **AI Integration**: OpenRouter API with Google Gemma 3 12B model
+
+## Development
 
 Currently, two official plugins are available:
 

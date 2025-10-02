@@ -1,10 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Clock, Users, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Calendar, Clock, Users, FileText, Sparkles, Loader2 } from 'lucide-react';
+import { useAISummary } from '@/hooks/useAISummary';
 
 interface EventCardProps {
   event: {
+    id: string;
     title: string;
     start: string;
     end: string;
@@ -15,6 +18,9 @@ interface EventCardProps {
 }
 
 export function EventCard({ event }: EventCardProps) {
+  const { generateSummary, getSummaryState } = useAISummary();
+  const summaryState = getSummaryState(event.id);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('en-US', {
       month: 'short',
@@ -34,17 +40,44 @@ export function EventCard({ event }: EventCardProps) {
 
   const isUpcoming = new Date(event.start) > new Date();
 
+  const handleGenerateSummary = () => {
+    generateSummary(event.id, {
+      title: event.title,
+      description: event.description,
+      duration: event.duration,
+      attendees: event.attendees,
+      startTime: event.start,
+      endTime: event.end
+    });
+  };
+
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border-0 hover:scale-[1.02]">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <CardTitle className="text-lg leading-tight pr-4">{event.title}</CardTitle>
-          <Badge 
-            variant={isUpcoming ? "default" : "secondary"} 
-            className="text-xs shrink-0"
-          >
-            {isUpcoming ? "Upcoming" : "Past"}
-          </Badge>
+          <div className="flex items-center space-x-2 shrink-0">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleGenerateSummary}
+              disabled={summaryState.isLoading}
+              className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+              title="Generate AI Summary"
+            >
+              {summaryState.isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+            </Button>
+            <Badge 
+              variant={isUpcoming ? "default" : "secondary"} 
+              className="text-xs"
+            >
+              {isUpcoming ? "Upcoming" : "Past"}
+            </Badge>
+          </div>
         </div>
         <CardDescription className="flex items-center space-x-2 text-sm">
           <Calendar className="h-4 w-4" />
@@ -78,6 +111,75 @@ export function EventCard({ event }: EventCardProps) {
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {event.description}
               </p>
+            </div>
+          </>
+        )}
+
+        {summaryState.summary && (
+          <>
+            <Separator />
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2 text-sm font-medium">
+                <Sparkles className="h-4 w-4 text-blue-600" />
+                <span className="text-blue-600">AI Summary</span>
+              </div>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border border-blue-100">
+                <div className="text-sm text-gray-700 leading-relaxed space-y-3">
+                  {summaryState.summary.split('\n\n').map((paragraph, index) => {
+                    // Handle different formatting patterns
+                    if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+                      // Bold headers
+                      const text = paragraph.replace(/\*\*/g, '');
+                      return (
+                        <h4 key={index} className="font-semibold text-gray-800 text-base">
+                          {text}
+                        </h4>
+                      );
+                    } else if (paragraph.includes('**')) {
+                      // Mixed formatting with bold sections
+                      const parts = paragraph.split(/(\*\*[^*]+\*\*)/);
+                      return (
+                        <p key={index} className="leading-relaxed">
+                          {parts.map((part, partIndex) => {
+                            if (part.startsWith('**') && part.endsWith('**')) {
+                              return (
+                                <span key={partIndex} className="font-semibold text-gray-800">
+                                  {part.replace(/\*\*/g, '')}
+                                </span>
+                              );
+                            }
+                            return <span key={partIndex}>{part}</span>;
+                          })}
+                        </p>
+                      );
+                    } else {
+                      // Regular paragraphs
+                      return (
+                        <p key={index} className="leading-relaxed">
+                          {paragraph}
+                        </p>
+                      );
+                    }
+                  })}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {summaryState.error && (
+          <>
+            <Separator />
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2 text-sm font-medium text-red-600">
+                <Sparkles className="h-4 w-4" />
+                <span>AI Summary Error</span>
+              </div>
+              <div className="bg-red-50 p-3 rounded-lg border border-red-100">
+                <p className="text-sm text-red-700">
+                  {summaryState.error}
+                </p>
+              </div>
             </div>
           </>
         )}
